@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 }
 
 const GTM_TAG = process.env.GTM_TAG
-const GOOGLE_AD_PUBLISH_ID = process.env.GTM_TAG
+const GOOGLE_AD_PUBLISH_ID = process.env.GOOGLE_AD_PUBLISH_ID
 
 export default async function RootLayout({
   children,
