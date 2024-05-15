@@ -5,6 +5,7 @@ import { GoogleTagManager } from "@next/third-parties/google"
 import Header from "./components/Header"
 import ArticleList from "./components/ArticleList"
 import Head from "next/head"
+import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,6 +25,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <GoogleTagManager gtmId={`${GTM_TAG}`} />
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1554747425116353"
+        crossOrigin="anonymous"
+      ></Script>
       <Head>
         <meta
           name="google-adsense-account"
