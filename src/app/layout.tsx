@@ -29,6 +29,10 @@ export default async function RootLayout({
           name="google-adsense-account"
           content={`${GOOGLE_AD_PUBLISH_ID}`}
         />
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-1554747425116353"
+        ></meta>
       </Head>
       <body className={inter.className}>
         <main className="flex min-h-screen flex-col items-center justify-between p-24 text-white w-full">
