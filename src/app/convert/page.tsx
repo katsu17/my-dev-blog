@@ -5,7 +5,7 @@ import dynamic from "next/dynamic"
 import "ace-builds/src-noconflict/ace"
 import "ace-builds/src-noconflict/mode-html"
 import "ace-builds/src-noconflict/theme-monokai"
-import styles from "../../styles/ConvertPage.module.css"
+import styles from "../styles/ConvertPage.module.css"
 
 // Aceエディタを動的にインポートします
 const AceEditor = dynamic(() => import("react-ace"), { ssr: false })
