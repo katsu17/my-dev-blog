@@ -1,12 +1,18 @@
 "use client"
 
 import { useState, ChangeEvent, FormEvent } from "react"
-import imageCompression from "browser-image-compression"
-import styles from "../styles/CompressPage.module.css"
+import dynamic from "next/dynamic"
+import "ace-builds/src-noconflict/ace"
+import "ace-builds/src-noconflict/mode-html"
+import "ace-builds/src-noconflict/theme-monokai"
+import styles from "../../styles/CompressPage.module.css"
+
+// Aceエディタを動的にインポートします
+const AceEditor = dynamic(() => import("react-ace"), { ssr: false })
 
 const CompressPage = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [compressedFile, setCompressedFile] = useState<Blob | null>(null)
+  const [compressedImageUrl, setCompressedImageUrl] = useState("")
   const [sizeInfo, setSizeInfo] = useState("")
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,34 +25,32 @@ const CompressPage = () => {
     e.preventDefault()
     if (!selectedFile) return
 
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920,
-      useWebWorker: true,
-    }
+    const formData = new FormData()
+    formData.append("image", selectedFile)
 
-    try {
-      const compressedBlob = await imageCompression(selectedFile, options)
-      setCompressedFile(compressedBlob)
+    const response = await fetch("/api/compress", {
+      method: "POST",
+      body: formData,
+    })
 
-      const originalSize = selectedFile.size
-      const compressedSize = compressedBlob.size
-      setSizeInfo(`Original Size: ${(originalSize / 1024).toFixed(2)} KB
-        Compressed Size: ${(compressedSize / 1024).toFixed(2)} KB
-        Reduction: ${((1 - compressedSize / originalSize) * 100).toFixed(2)}%`)
-    } catch (error) {
-      console.error("Error compressing the image", error)
+    const data = await response.json()
+    if (data.compressed_image_url) {
+      setCompressedImageUrl(data.compressed_image_url)
+      setSizeInfo(`Original Size: ${(data.original_size / 1024).toFixed(2)} KB
+        Compressed Size: ${(data.compressed_image_size / 1024).toFixed(2)} KB
+        Reduction: ${(
+          (1 - data.compressed_image_size / data.original_size) *
+          100
+        ).toFixed(2)}%`)
     }
   }
 
   const downloadCompressedImage = () => {
-    if (compressedFile) {
-      const url = URL.createObjectURL(compressedFile)
+    if (compressedImageUrl) {
       const a = document.createElement("a")
-      a.href = url
+      a.href = compressedImageUrl
       a.download = "compressed_image.jpg"
       a.click()
-      URL.revokeObjectURL(url)
     }
   }
 
@@ -64,7 +68,7 @@ const CompressPage = () => {
         <br />
         <button type="submit">Compress Image</button>
       </form>
-      {compressedFile && (
+      {compressedImageUrl && (
         <div>
           <h2>Compressed Image</h2>
           <button
