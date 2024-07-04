@@ -1,22 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
-import formidable, { File, Fields, Files, IncomingForm } from "formidable"
+import formidable, { File, Fields, Files } from "formidable"
 import fs from "fs"
 import sharp from "sharp"
 
 export const runtime = "nodejs" // 必要に応じてランタイムを指定
 
-export const POST = async (req: NextRequest) => {
+export async function POST(req: NextRequest) {
   return new Promise((resolve, reject) => {
-    const form = new IncomingForm() as unknown as formidable.IncomingForm & {
-      uploadDir: string
-      keepExtensions: boolean
-    }
+    const form =
+      new formidable.IncomingForm() as unknown as formidable.IncomingForm & {
+        uploadDir: string
+        keepExtensions: boolean
+      }
     form.uploadDir = "./public/uploads" // 型アサーションを使用
     form.keepExtensions = true // 型アサーションを使用
 
-    form.parse(
+    ;(form as any).parse(
       req as any,
-      async (err: any, fields: formidable.Fields, files: formidable.Files) => {
+      async (err: any, fields: Fields, files: Files) => {
         // 型を明示的に指定
         if (err) {
           reject(
@@ -34,7 +35,7 @@ export const POST = async (req: NextRequest) => {
           )
           return
         }
-        const actualFile = file as formidable.File // 型を適切にキャスト
+        const actualFile = file as File // 型を適切にキャスト
 
         const originalSize = fs.statSync(actualFile.filepath).size
         const outputFilePath = `./public/uploads/compressed_${actualFile.newFilename}`
