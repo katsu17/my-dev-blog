@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import parse from "html-react-parser"
 import { getDetail, getList } from "../libs/microcms"
 import Image from "next/image"
+import BlogPost from "../components/BlogPost/page"
 
 export async function generateStaticParams() {
   const { contents } = await getList()
@@ -43,7 +44,8 @@ export default async function Page({
           alt={`${post.title}`}
         />
       </div>
-      <div>{parse(post.content)}</div>
+      {/* <div>{parse(post.content)}</div> */}
+      <BlogPost content={post.content} />
     </div>
   )
 }

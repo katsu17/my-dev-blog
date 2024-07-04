@@ -41,7 +41,7 @@ export default async function RootLayout({
         ></meta>
       </Head>
       <body className={inter.className}>
-        <main className="flex min-h-screen flex-col items-center justify-between p-24 text-white w-full">
+        <main className="flex min-h-screen flex-col items-center justify-between p-4 text-white w-full mt-20 overflow-hidden">
           <Header />
           {children}
           <ArticleList />

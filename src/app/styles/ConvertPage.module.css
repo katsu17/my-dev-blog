@@ -1,0 +1,33 @@
+.container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.container textarea {
+  width: 100%;
+  max-width: 500px;
+  color: #333;
+}
+
+.container button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.container button:hover {
+  background-color: #45a049;
+}
+
+.table {
+  margin-top: 20px;
+}
+
+.table h2 {
+  margin-bottom: 10px;
+}

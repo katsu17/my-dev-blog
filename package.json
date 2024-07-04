@@ -10,14 +10,21 @@
   },
   "dependencies": {
     "@next/third-parties": "^14.2.3",
+    "ace-builds": "^1.35.2",
+    "browser-image-compression": "^2.0.2",
+    "file-loader": "^6.2.0",
+    "formidable": "^3.5.1",
     "html-react-parser": "^5.1.10",
     "microcms-js-sdk": "^3.1.1",
     "next": "^14.2.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-ace": "^12.0.0",
+    "react-dom": "^18",
+    "sharp": "^0.33.4"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/formidable": "^3.4.5",
+    "@types/node": "^20.14.9",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
