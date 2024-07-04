@@ -3,11 +3,7 @@ import formidable, { File } from "formidable"
 import fs from "fs"
 import sharp from "sharp"
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
+export const runtime = "nodejs"
 
 const compressImage = async (
   file: File
