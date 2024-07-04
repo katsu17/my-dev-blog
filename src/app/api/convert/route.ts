@@ -15,7 +15,7 @@ const convertToHtmlTable = (data: string): string => {
   return table
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json() // リクエストボディをJSON形式で解析
     const { excel_data } = body

@@ -5,7 +5,7 @@ import sharp from "sharp"
 
 export const runtime = "nodejs" // 必要に応じてランタイムを指定
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   return new Promise((resolve, reject) => {
     const form =
       new formidable.IncomingForm() as unknown as formidable.IncomingForm & {
@@ -63,5 +63,5 @@ export async function POST(req: NextRequest) {
         }
       }
     )
-  })
+  }) as Promise<NextResponse>
 }
