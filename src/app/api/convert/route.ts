@@ -7,7 +7,7 @@ const convertToHtmlTable = (data: string): string => {
     table += "  <tr>\n"
     const cells = row.split("\t")
     cells.forEach((cell) => {
-      table += `    <td style='padding: 5px; border: 1px solid white;'>${cell}</td>\n`
+      table += `    <td style='padding: 5px; border: 1px solid black;'>${cell}</td>\n`
     })
     table += "  </tr>\n"
   })

@@ -1,9 +1,13 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextRequest, NextResponse } from "next/server"
 import formidable, { File } from "formidable"
 import fs from "fs"
 import sharp from "sharp"
 
-export const runtime = "nodejs"
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
 
 const compressImage = async (
   file: File
@@ -17,31 +21,36 @@ const compressImage = async (
   }
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "POST") {
-    const form = new formidable.IncomingForm()
-    ;(form as any).uploadDir = "./public/uploads" // 型アサーションを使用
-    ;(form as any).keepExtensions = true // 型アサーションを使用
+export async function POST(req: NextRequest) {
+  const form = new formidable.IncomingForm() as any
+  form.uploadDir = "./public/uploads"
+  form.keepExtensions = true
 
+  return new Promise((resolve, reject) => {
     form.parse(req, async (err, fields, files) => {
       if (err) {
-        res.status(500).json({ error: "Error parsing the file" })
+        reject(
+          NextResponse.json(
+            { error: "Error parsing the file" },
+            { status: 500 }
+          )
+        )
         return
       }
-      const file = (files.image as File[])[0] // 型を適切にキャスト
+
+      const file = Array.isArray(files.image) ? files.image[0] : files.image
       const originalSize = fs.statSync(file.filepath).size
       const compressedImage = await compressImage(file)
-      res.status(200).json({
-        compressed_image_url: `/uploads/${compressedImage.path
-          .split("/")
-          .pop()}`,
-        compressed_image_size: compressedImage.size,
-        original_size: originalSize,
-      })
-    })
-  } else {
-    res.status(405).json({ message: "Method not allowed" })
-  }
-}
 
-export default handler
+      resolve(
+        NextResponse.json({
+          compressed_image_url: `/uploads/${compressedImage.path
+            .split("/")
+            .pop()}`,
+          compressed_image_size: compressedImage.size,
+          original_size: originalSize,
+        })
+      )
+    })
+  })
+}
