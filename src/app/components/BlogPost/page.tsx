@@ -1,4 +1,3 @@
-// components/BlogPost.tsx
 import React from "react"
 import parse, {
   domToReact,
