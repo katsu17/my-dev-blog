@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import parse from "html-react-parser"
 import { getDetail, getList } from "../libs/microcms"
 import Image from "next/image"
-import BlogPost from "../components/BlogPost/page"
+import BlogPost from "../components/BlogPost"
 
 export async function generateStaticParams() {
   const { contents } = await getList()
