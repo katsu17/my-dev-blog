@@ -1,83 +1,81 @@
 "use client"
 
-import { useState, ChangeEvent, FormEvent } from "react"
-import dynamic from "next/dynamic"
-import "ace-builds/src-noconflict/ace"
-import "ace-builds/src-noconflict/mode-html"
-import "ace-builds/src-noconflict/theme-monokai"
-import styles from "../styles/CompressPage.module.css"
-
-// Aceエディタを動的にインポートします
-const AceEditor = dynamic(() => import("react-ace"), { ssr: false })
+import React, { useState } from "react"
 
 const CompressPage = () => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [compressedImageUrl, setCompressedImageUrl] = useState("")
-  const [sizeInfo, setSizeInfo] = useState("")
+  const [file, setFile] = useState<File | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [compressedImageUrl, setCompressedImageUrl] = useState<string | null>(
+    null
+  )
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0])
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0])
     }
   }
 
-  const handleUpload = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!selectedFile) return
-
-    const formData = new FormData()
-    formData.append("image", selectedFile)
-
-    const response = await fetch("/api/compress", {
-      method: "POST",
-      body: formData,
-    })
-
-    const data = await response.json()
-    if (data.compressed_image_url) {
-      setCompressedImageUrl(data.compressed_image_url)
-      setSizeInfo(`Original Size: ${(data.original_size / 1024).toFixed(2)} KB
-        Compressed Size: ${(data.compressed_image_size / 1024).toFixed(2)} KB
-        Reduction: ${(
-          (1 - data.compressed_image_size / data.original_size) *
-          100
-        ).toFixed(2)}%`)
+  const handleCompress = () => {
+    if (!file) {
+      setError("Please select a file to upload")
+      return
     }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        const ctx = canvas.getContext("2d")
+        if (!ctx) {
+          setError("Failed to get canvas context")
+          return
+        }
+
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx.drawImage(img, 0, 0, img.width, img.height)
+
+        // JPEGで圧縮
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.85)
+        setCompressedImageUrl(compressedDataUrl)
+        localStorage.setItem("compressedImage", compressedDataUrl)
+        setError(null)
+      }
+      img.onerror = () => {
+        setError("Failed to load image")
+      }
+      img.src = event.target?.result as string
+    }
+    reader.onerror = () => {
+      setError("Failed to read file")
+    }
+    reader.readAsDataURL(file)
   }
 
-  const downloadCompressedImage = () => {
-    if (compressedImageUrl) {
-      const a = document.createElement("a")
-      a.href = compressedImageUrl
-      a.download = "compressed_image.jpg"
-      a.click()
+  const handleDownload = () => {
+    const compressedImage = localStorage.getItem("compressedImage")
+    if (compressedImage) {
+      const link = document.createElement("a")
+      link.href = compressedImage
+      link.download = "compressed_image.jpg"
+      link.click()
+    } else {
+      setError("No compressed image available")
     }
   }
 
   return (
-    <div className={styles.container}>
-      <h1>Image Compressor</h1>
-      <form onSubmit={handleUpload}>
-        <input type="file" accept="image/*" onChange={handleFileChange} />
-        <br />
-        {selectedFile && (
-          <span className={styles.fileInfo}>
-            Selected file: {selectedFile.name}
-          </span>
-        )}
-        <br />
-        <button type="submit">Compress Image</button>
-      </form>
+    <div>
+      <h1>Compress Image</h1>
+      <input type="file" accept="image/*" onChange={handleFileChange} />
+      <button onClick={handleCompress}>Compress Image</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       {compressedImageUrl && (
         <div>
           <h2>Compressed Image</h2>
-          <button
-            onClick={downloadCompressedImage}
-            className={styles.downloadLink}
-          >
-            Download Compressed Image
-          </button>
-          <div className={styles.sizeInfo}>{sizeInfo}</div>
+          <img src={compressedImageUrl} alt="Compressed" />
+          <button onClick={handleDownload}>Download Compressed Image</button>
         </div>
       )}
     </div>
